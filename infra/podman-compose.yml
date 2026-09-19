@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: lohn-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lohn
+      POSTGRES_PASSWORD: lohn
+      POSTGRES_DB: lohn
+    ports:
+      - "15432:5432"
+    volumes:
+      - ../podman-data/postgres:/var/lib/postgresql/data
