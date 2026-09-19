@@ -11,7 +11,12 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    disableSignUp: true,
   },
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://app.lohn.cc",
+  ],
   plugins: [organization()],
 });
 

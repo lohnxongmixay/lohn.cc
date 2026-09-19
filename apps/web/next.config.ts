@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  allowedDevOrigins: ["app.lohn.cc"],
+  transpilePackages: ["@lohn/auth", "@lohn/db"],
 };
 
 export default nextConfig;

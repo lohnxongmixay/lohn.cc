@@ -1,0 +1,7 @@
+tunnel: cb8a43cd-04a5-4301-a859-59a207c5b2de
+credentials-file: /etc/cloudflared/cb8a43cd-04a5-4301-a859-59a207c5b2de.json
+
+ingress:
+  - hostname: app.lohn.cc
+    service: http://localhost:3000
+  - service: http_status:404
