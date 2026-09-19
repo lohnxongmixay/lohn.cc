@@ -56,9 +56,14 @@ export default async function CrmPage() {
     <main className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">CRM</h1>
-        <Link href="/" className="text-sm text-gray-500 underline">
-          Back home
-        </Link>
+        <nav className="flex gap-3 text-sm">
+          <Link href="/crm/board" className="rounded border px-3 py-1.5 underline">
+            Board view
+          </Link>
+          <Link href="/" className="text-gray-500 underline">
+            Back home
+          </Link>
+        </nav>
       </header>
 
       <section className="flex flex-col gap-3">

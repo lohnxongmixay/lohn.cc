@@ -2,9 +2,10 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { and, eq } from "drizzle-orm";
 import { auth } from "@lohn/auth";
 import { db } from "@lohn/db";
-import { contact, deal } from "@lohn/db/schema";
+import { contact, deal, dealStages } from "@lohn/db/schema";
 
 async function requireActiveOrg() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -29,6 +30,21 @@ export async function createContact(formData: FormData) {
   });
 
   revalidatePath("/crm");
+}
+
+export async function updateDealStage(dealId: string, stage: string) {
+  const { organizationId } = await requireActiveOrg();
+
+  if (!(dealStages as readonly string[]).includes(stage)) {
+    throw new Error("Invalid stage");
+  }
+
+  await db
+    .update(deal)
+    .set({ stage })
+    .where(and(eq(deal.id, dealId), eq(deal.organizationId, organizationId)));
+
+  revalidatePath("/crm/board");
 }
 
 export async function createDeal(formData: FormData) {
