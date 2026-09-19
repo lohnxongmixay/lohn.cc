@@ -31,6 +31,13 @@ export default async function Home() {
         <h1 className="text-xl font-semibold">lohn.cc</h1>
         <span className="text-sm text-gray-500">{session.user.email}</span>
       </header>
+      {session.session.activeOrganizationId && (
+        <nav className="flex gap-3 text-sm">
+          <Link href="/crm" className="rounded border px-3 py-1.5 underline">
+            CRM
+          </Link>
+        </nav>
+      )}
       <OrgPanel />
     </main>
   );

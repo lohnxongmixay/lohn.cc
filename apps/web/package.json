@@ -15,7 +15,8 @@
     "react-dom": "19.2.8",
     "@lohn/auth": "workspace:*",
     "@lohn/db": "workspace:*",
-    "better-auth": "^1.7.5"
+    "better-auth": "^1.7.5",
+    "drizzle-orm": "^0.38.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
