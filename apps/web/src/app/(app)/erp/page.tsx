@@ -8,26 +8,11 @@ import { createInvoice, addInvoiceItem, updateInvoiceStatus } from "./actions";
 
 export default async function ErpPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
-    return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-sm text-gray-500">
-          Please{" "}
-          <Link href="/sign-in" className="underline">
-            sign in
-          </Link>{" "}
-          to view the ERP.
-        </p>
-      </main>
-    );
-  }
-
-  const organizationId = session.session.activeOrganizationId;
+  const organizationId = session?.session.activeOrganizationId;
 
   if (!organizationId) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
+      <main className="mx-auto flex max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-sm text-gray-500">
           No active organization yet.{" "}
           <Link href="/" className="underline">
@@ -54,12 +39,7 @@ export default async function ErpPage() {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">ERP — Invoices</h1>
-        <Link href="/" className="text-sm text-gray-500 underline">
-          Back home
-        </Link>
-      </header>
+      <h1 className="text-xl font-semibold">ERP — Invoices</h1>
 
       <section className="flex flex-col gap-4">
         {invoices.length === 0 && (

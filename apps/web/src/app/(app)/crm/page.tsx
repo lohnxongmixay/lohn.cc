@@ -8,26 +8,11 @@ import { createContact, createDeal } from "./actions";
 
 export default async function CrmPage() {
   const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
-    return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-sm text-gray-500">
-          Please{" "}
-          <Link href="/sign-in" className="underline">
-            sign in
-          </Link>{" "}
-          to view the CRM.
-        </p>
-      </main>
-    );
-  }
-
-  const organizationId = session.session.activeOrganizationId;
+  const organizationId = session?.session.activeOrganizationId;
 
   if (!organizationId) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
+      <main className="mx-auto flex max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-sm text-gray-500">
           No active organization yet.{" "}
           <Link href="/" className="underline">
@@ -54,17 +39,7 @@ export default async function CrmPage() {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">CRM</h1>
-        <nav className="flex gap-3 text-sm">
-          <Link href="/crm/board" className="rounded border px-3 py-1.5 underline">
-            Board view
-          </Link>
-          <Link href="/" className="text-gray-500 underline">
-            Back home
-          </Link>
-        </nav>
-      </header>
+      <h1 className="text-xl font-semibold">CRM</h1>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-medium text-gray-500">Contacts</h2>
