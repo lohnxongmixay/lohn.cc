@@ -78,9 +78,18 @@ export default async function ErpPage() {
                   <span className="text-gray-500"> · {inv.contact.name}</span>
                   <span className="text-gray-500"> · {inv.status}</span>
                 </div>
-                <span className="font-medium">
-                  {total.toLocaleString()} {inv.currency}
-                </span>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href={`/invoice/${inv.id}`}
+                    target="_blank"
+                    className="text-xs text-gray-500 underline"
+                  >
+                    Share link
+                  </Link>
+                  <span className="font-medium">
+                    {total.toLocaleString()} {inv.currency}
+                  </span>
+                </div>
               </div>
               <ul className="mt-2 flex flex-col gap-1 text-sm text-gray-600">
                 {inv.items.map((item) => (
