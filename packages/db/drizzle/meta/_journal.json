@@ -15,6 +15,13 @@
       "when": 1789804787940,
       "tag": "0001_noisy_centennial",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789805170634,
+      "tag": "0002_sweet_mystique",
+      "breakpoints": true
     }
   ]
 }

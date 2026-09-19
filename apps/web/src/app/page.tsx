@@ -36,6 +36,9 @@ export default async function Home() {
           <Link href="/crm" className="rounded border px-3 py-1.5 underline">
             CRM
           </Link>
+          <Link href="/erp" className="rounded border px-3 py-1.5 underline">
+            ERP
+          </Link>
         </nav>
       )}
       <OrgPanel />
