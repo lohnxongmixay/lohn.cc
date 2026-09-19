@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { auth } from "@lohn/auth";
 import { OrgPanel } from "./org-panel";
+import { SignOutButton } from "./sign-out-button";
 
 export default async function Home() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -29,7 +30,10 @@ export default async function Home() {
     <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 p-6">
       <header className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">lohn.cc</h1>
-        <span className="text-sm text-gray-500">{session.user.email}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">{session.user.email}</span>
+          <SignOutButton />
+        </div>
       </header>
       {session.session.activeOrganizationId && (
         <nav className="flex gap-3 text-sm">
