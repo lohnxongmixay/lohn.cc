@@ -1,12 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export function OrgPanel() {
+  const router = useRouter();
   const { data: organizations, isPending, refetch } = authClient.useListOrganizations();
+  const { data: activeOrg, isPending: activePending } = authClient.useActiveOrganization();
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [switching, setSwitching] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (
+      !isPending &&
+      !activePending &&
+      !activeOrg &&
+      organizations &&
+      organizations.length > 0
+    ) {
+      authClient.organization
+        .setActive({ organizationId: organizations[0].id })
+        .then(() => router.refresh());
+    }
+  }, [isPending, activePending, activeOrg, organizations, router]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -18,6 +36,14 @@ export function OrgPanel() {
     setCreating(false);
     setName("");
     refetch();
+    router.refresh();
+  }
+
+  async function handleSwitch(organizationId: string) {
+    setSwitching(organizationId);
+    await authClient.organization.setActive({ organizationId });
+    setSwitching(null);
+    router.refresh();
   }
 
   return (
@@ -29,11 +55,31 @@ export function OrgPanel() {
           <p className="text-sm text-gray-400">No organizations yet — create one below.</p>
         )}
         <ul className="flex flex-col gap-2">
-          {organizations?.map((org) => (
-            <li key={org.id} className="rounded border px-3 py-2 text-sm">
-              {org.name}
-            </li>
-          ))}
+          {organizations?.map((org) => {
+            const isActive = activeOrg?.id === org.id;
+            return (
+              <li
+                key={org.id}
+                className="flex items-center justify-between rounded border px-3 py-2 text-sm"
+              >
+                <span>
+                  {org.name}
+                  {isActive && (
+                    <span className="ml-2 text-xs text-green-600">(active)</span>
+                  )}
+                </span>
+                {!isActive && (
+                  <button
+                    onClick={() => handleSwitch(org.id)}
+                    disabled={switching === org.id}
+                    className="text-xs underline disabled:opacity-50"
+                  >
+                    {switching === org.id ? "Switching…" : "Switch"}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
       <form onSubmit={handleCreate} className="flex gap-2">
