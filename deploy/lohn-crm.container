@@ -1,0 +1,33 @@
+# Installed by ~/apps/lohn-crm/deploy.sh into ~/.config/containers/systemd/lohn-crm.container.
+# Edit this copy in the repo, not the installed one.
+[Unit]
+Description=lohn.cc CRM/ERP (Next.js) at app.lohn.cc
+After=network-online.target postgres.service
+Wants=network-online.target postgres.service
+
+[Container]
+Image=localhost/lohn-crm:current
+Pull=never
+ContainerName=lohn-crm
+Network=proxy-net
+Network=db-net
+Secret=lohn_crm_database_url,type=env,target=DATABASE_URL
+Secret=lohn_crm_auth_secret,type=env,target=BETTER_AUTH_SECRET
+Environment=BETTER_AUTH_URL=https://app.lohn.cc
+ReadOnly=true
+Tmpfs=/tmp:rw,mode=1777
+Tmpfs=/app/apps/web/.next/cache:rw,mode=1777
+NoNewPrivileges=true
+DropCapability=ALL
+HealthCmd=wget -q -O /dev/null http://127.0.0.1:3000/sign-in
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=20s
+PodmanArgs=--memory=512m --cpus=1
+
+[Service]
+Restart=always
+TimeoutStartSec=90
+
+[Install]
+WantedBy=default.target

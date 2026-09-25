@@ -1,0 +1,9 @@
+**/node_modules
+**/.next
+.git
+podman-data
+.env
+.env.*
+!.env.example
+*.log
+deploy

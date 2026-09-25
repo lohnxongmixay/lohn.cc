@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-lohn.cc is a one-man software house's internal CRM/ERP platform, built modularly so each business module can later ship separately as SaaS. Targets the Laos market (LAK is the default currency throughout). Live production instance: https://app.lohn.cc.
+lohn.cc is a one-man software house's internal CRM/ERP platform, built modularly so each business module can later ship separately as SaaS. Targets the Laos market (LAK is the default currency throughout). Live production instance: https://app.lohn.cc (hosted on vmi3603948; see "Production deployment").
 
 ## Commands
 
@@ -36,16 +36,25 @@ podman-compose -f infra/podman-compose.yml up -d
 
 Runs `postgres:16-alpine` on host port **15432** (not 5432 — that port is used by an unrelated native systemd Postgres instance on this machine for a separate purpose), with default credentials `lohn:lohn@localhost:15432/lohn`, bind-mounted to `podman-data/postgres/` (gitignored). `packages/db/src/client.ts` and `drizzle.config.ts` both default to this URL when `DATABASE_URL` is unset.
 
-### Production deployment (this machine)
+### Production deployment (vmi3603948 / rocky.lohn.cc, since 2026-09-25)
 
-The live app is **not** run via `next dev`. It runs a production build (`next build && next start`) as a `systemctl --user` service (`lohn-web`, lingering enabled so it survives logout/reboot), fronted by a system-level `cloudflared` service tunneling `app.lohn.cc` → `localhost:3000`. After changing app code that needs to go live:
+Production runs as a **rootless Podman container** on the `vmi3603948` host (working copy `~/apps/lohn-crm`). Host-wide conventions are in that host's `~/ops/INFRASTRUCTURE.md`. The request path: Cloudflare (`app.lohn.cc` CNAME → `rocky.lohn.cc`, proxied) → the host's Caddy → container `lohn-crm:3000` (`next start`). The database is `lohn_crm` (role `lohn_crm`) on the host's shared `postgres` container, reached over the internal `db-net` network.
 
 ```
-cd apps/web && ./node_modules/.bin/next build
-systemctl --user restart lohn-web
+./deploy.sh              # build image → pg_dump → drizzle-kit migrate → restart → smoke test
+./deploy.sh --rollback   # previous image (migrations are forward-only; restore the pre-deploy dump if the schema changed)
+podman exec -it lohn-crm node scripts/create-user.mjs --email you@example.com --name "Name"   # sign-up is disabled
+podman exec -it lohn-crm node scripts/create-user.mjs --email you@example.com --reset-password
+podman logs -f lohn-crm
 ```
 
-This split matters: Next's dev server actively blocks cross-origin requests (including from the tunnel's public hostname), which silently breaks real sign-in/sign-up traffic. Never point the public tunnel at `next dev`.
+- `Containerfile` builds with `pnpm --filter @lohn/web build`, not turbo, which fails in sandboxed builds (see above). `NEXT_PUBLIC_APP_URL` is a build arg (default `https://app.lohn.cc`), because it's inlined at build time.
+- Runtime settings come from **podman secrets**: `lohn_crm_database_url` → `DATABASE_URL` and `lohn_crm_auth_secret` → `BETTER_AUTH_SECRET`. `BETTER_AUTH_URL` is set in `deploy/lohn-crm.container` (the Quadlet unit, installed by `deploy.sh`). Nothing secret lives in this repo.
+- The container is read-only (tmpfs for `/tmp` and `apps/web/.next/cache`), drops all capabilities, and runs as `node`.
+- Backups: `deploy.sh` dumps the database before every migration, and a nightly user timer (`lohn-crm-backup.timer`) keeps 14 days of `pg_dump -Fc` files in `~/backups/lohn-crm/`.
+- Never serve `next dev` publicly: its cross-origin checks silently break real sign-in traffic.
+
+The previous setup (a `lohn-web` user service on another machine behind the Cloudflare Tunnel in `infra/cloudflared/`) is **retired**; that file is kept only for reference.
 
 ## Architecture
 
